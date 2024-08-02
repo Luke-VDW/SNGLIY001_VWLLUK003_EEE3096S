@@ -45,6 +45,7 @@ TIM_HandleTypeDef htim16;
 /* USER CODE BEGIN PV */
 // TODO: Define input variables
 
+//may use 2d array instead
 const uint8_t LED_PATTERNS[9] = {
     0b11101001, 0b11010010, 0b10100100, 0b01001000,
     0b10010000, 0b00100000, 0b01000000, 0b10000000,
@@ -97,7 +98,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // TODO: Start timer TIM16
+  HAL_TIM_Base_Start_IT(&htim16);// is this right?
 
+  
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -109,7 +113,24 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
     // TODO: Check pushbuttons to change timer delay
-    
+	  void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	      switch(GPIO_Pin) {
+	          case Button0_Pin:
+	              __HAL_TIM_SET_AUTORELOAD(&htim16, 500-1);
+	              break;
+	          case Button1_Pin:
+	              __HAL_TIM_SET_AUTORELOAD(&htim16, 2000-1);
+	              break;
+	          case Button2_Pin:
+	              __HAL_TIM_SET_AUTORELOAD(&htim16, 1000-1);
+	              break;
+	          case Button3_Pin:
+	              current_pattern = 0;
+	              displayPattern(LED_PATTERNS[current_pattern]);
+	              break;
+	      }
+	  }
+
     
 
   }
@@ -332,9 +353,10 @@ void TIM16_IRQHandler(void)
 
 	// TODO: Change LED pattern
 	// print something
-
-  
+	
 }
+
+
 
 /* USER CODE END 4 */
 
