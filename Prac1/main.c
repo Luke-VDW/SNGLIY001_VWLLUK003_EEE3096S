@@ -113,23 +113,23 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
     // TODO: Check pushbuttons to change timer delay
-	  void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	      switch(GPIO_Pin) {
-	          case Button0_Pin:
-	              __HAL_TIM_SET_AUTORELOAD(&htim16, 500-1);
-	              break;
-	          case Button1_Pin:
-	              __HAL_TIM_SET_AUTORELOAD(&htim16, 2000-1);
-	              break;
-	          case Button2_Pin:
-	              __HAL_TIM_SET_AUTORELOAD(&htim16, 1000-1);
-	              break;
-	          case Button3_Pin:
-	              current_pattern = 0;
-	              displayPattern(LED_PATTERNS[current_pattern]);
-	              break;
-	      }
-	  }
+	  
+	  switch(GPIO_Pin) {
+		  case Button0_Pin:
+			  __HAL_TIM_SET_AUTORELOAD(&htim16, 500-1);
+			  break;
+		  case Button1_Pin:
+			  __HAL_TIM_SET_AUTORELOAD(&htim16, 2000-1);
+			  break;
+		  case Button2_Pin:
+			  __HAL_TIM_SET_AUTORELOAD(&htim16, 1000-1);
+			  break;
+		  case Button3_Pin:
+			  current_pattern = 0;
+			  displayPattern(LED_PATTERNS[current_pattern]);
+			  break;
+	  }    
+	  
 
     
 
