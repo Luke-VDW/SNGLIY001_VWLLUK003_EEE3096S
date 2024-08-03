@@ -45,15 +45,31 @@ TIM_HandleTypeDef htim16;
 /* USER CODE BEGIN PV */
 // TODO: Define input variables
 
-//may use 2d array instead
-const uint8_t LED_PATTERNS[9] = {
-    0b11101001, 0b11010010, 0b10100100, 0b01001000,
-    0b10010000, 0b00100000, 0b01000000, 0b10000000,
-    0b00000000
+
+//Define LED patterns
+const uint8_t LED_PATTERNS[9][8] = {
+    {1, 1, 1, 0, 1, 0, 0, 1},
+    {1, 1, 0, 1, 0, 0, 1, 0},
+    {1, 0, 1, 0, 0, 1, 0, 0},
+    {0, 1, 0, 0, 1, 0, 0, 0},
+    {1, 0, 0, 1, 0, 0, 0, 0},
+    {0, 0, 1, 0, 0, 0, 0, 0},
+    {0, 1, 0, 0, 0, 0, 0, 0},
+    {1, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0}
 };
+
+//Set initial pattern
 uint8_t current_pattern = 0;
 
+//Set initial delay
 uint16_t delay = 500;
+
+//Define LED pin names
+const uint16_t LED_PINS[8] = {
+    LED0_Pin, LED1_Pin, LED2_Pin, LED3_Pin,
+	LED4_Pin, LED5_Pin, LED6_Pin, LED7_Pin};
+
 
 /* USER CODE END PV */
 
@@ -100,7 +116,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // TODO: Start timer TIM16
-  HAL_TIM_Base_Start_IT(&htim16);// is this right?
+  HAL_TIM_Base_Start_IT(&htim16);
 
   
   
@@ -346,11 +362,37 @@ void TIM16_IRQHandler(void)
 
 	// TODO: Change LED pattern
 
-	HAL_GPIO_TogglePin(GPIOB, LED0_Pin);
+	//Call function to set pattern
+	update_led_pattern(current_pattern);
+
+	//Change to next pattern in the sequence
+	current_pattern = (current_pattern + 1) % 9;
+
+
 	__HAL_TIM_SET_AUTORELOAD(&htim16, delay-1);
-	// print something
 	
+	// print something
 }
+
+// Function to update the LED pattern
+	void update_led_pattern(uint8_t pattern)
+	{
+	    for (int i = 0; i < 8; i++){
+	        // Extract the bit value at position i
+	        uint8_t bit_value = LED_PATTERNS[pattern][i];
+
+	        // Determine the pin state
+	        GPIO_PinState pin_state;
+	        if (bit_value == 1){
+	        	pin_state = GPIO_PIN_SET;
+	        }	else{
+	        		pin_state = GPIO_PIN_RESET ;
+	        }
+
+	        // Write the pin state to the corresponding GPIOB pin
+	        HAL_GPIO_WritePin(GPIOB, LED_PINS[i], pin_state);
+	    }
+	}
 /* USER CODE END 4 */
 
 /**
