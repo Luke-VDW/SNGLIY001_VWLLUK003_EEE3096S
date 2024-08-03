@@ -53,6 +53,8 @@ const uint8_t LED_PATTERNS[9] = {
 };
 uint8_t current_pattern = 0;
 
+uint16_t delay = 500;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -114,25 +116,16 @@ int main(void)
 
     // TODO: Check pushbuttons to change timer delay
 	  
-	  switch(GPIO_Pin) {
-		  case Button0_Pin:
-			  __HAL_TIM_SET_AUTORELOAD(&htim16, 500-1);
-			  break;
-		  case Button1_Pin:
-			  __HAL_TIM_SET_AUTORELOAD(&htim16, 2000-1);
-			  break;
-		  case Button2_Pin:
-			  __HAL_TIM_SET_AUTORELOAD(&htim16, 1000-1);
-			  break;
-		  case Button3_Pin:
-			  current_pattern = 0;
-			  displayPattern(LED_PATTERNS[current_pattern]);
-			  break;
-	  }    
-	  
-
-    
-
+	  // Handle pushbuttons to change delay and reset sequence
+	  if (HAL_GPIO_ReadPin(Button0_GPIO_Port, Button0_Pin) == GPIO_PIN_RESET) {
+		  delay = 500; // 0.5 seconds
+	  } else if (HAL_GPIO_ReadPin(Button1_GPIO_Port, Button1_Pin) == GPIO_PIN_RESET) {
+		  delay = 2000; // 2 seconds
+	  } else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2) == GPIO_PIN_RESET) {
+		  delay = 1000; // 1 second
+	  } else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3) == GPIO_PIN_RESET) {
+		  current_pattern = 0; // Reset to pattern 1
+	  }
   }
   /* USER CODE END 3 */
 }
@@ -352,12 +345,12 @@ void TIM16_IRQHandler(void)
 	HAL_TIM_IRQHandler(&htim16);
 
 	// TODO: Change LED pattern
+
+	HAL_GPIO_TogglePin(GPIOB, LED0_Pin);
+	__HAL_TIM_SET_AUTORELOAD(&htim16, delay-1);
 	// print something
 	
 }
-
-
-
 /* USER CODE END 4 */
 
 /**
