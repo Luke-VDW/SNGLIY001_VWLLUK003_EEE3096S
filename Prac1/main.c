@@ -135,10 +135,13 @@ int main(void)
 	  // Handle pushbuttons to change delay and reset sequence
 	  if (HAL_GPIO_ReadPin(Button0_GPIO_Port, Button0_Pin) == GPIO_PIN_RESET) {
 		  delay = 500; // 0.5 seconds
+		  __HAL_TIM_SET_AUTORELOAD(&htim16, delay-1);
 	  } else if (HAL_GPIO_ReadPin(Button1_GPIO_Port, Button1_Pin) == GPIO_PIN_RESET) {
 		  delay = 2000; // 2 seconds
+		  __HAL_TIM_SET_AUTORELOAD(&htim16, delay-1);
 	  } else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2) == GPIO_PIN_RESET) {
 		  delay = 1000; // 1 second
+		  __HAL_TIM_SET_AUTORELOAD(&htim16, delay-1);
 	  } else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3) == GPIO_PIN_RESET) {
 		  current_pattern = 0; // Reset to pattern 1
 	  }
@@ -369,7 +372,7 @@ void TIM16_IRQHandler(void)
 	current_pattern = (current_pattern + 1) % 9;
 
 
-	__HAL_TIM_SET_AUTORELOAD(&htim16, delay-1);
+	//__HAL_TIM_SET_AUTORELOAD(&htim16, delay-1);
 	
 	// print something
 }
