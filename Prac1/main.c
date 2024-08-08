@@ -63,7 +63,7 @@ const uint8_t LED_PATTERNS[9][8] = {
 uint8_t current_pattern = 0;
 
 //Set initial delay
-uint16_t delay = 500;
+uint16_t delay = 1000;
 
 //Define LED pin names
 const uint16_t LED_PINS[8] = {
