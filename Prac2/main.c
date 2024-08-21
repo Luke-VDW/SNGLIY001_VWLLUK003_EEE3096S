@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "stm32f0xx.h"
+#include <lcd_stm32f0.c>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -36,6 +37,7 @@
 #define NS 128           // Number of samples in LUT
 #define TIM2CLK 8000000  // STM Clock frequency
 #define F_SIGNAL 640    // Frequency of output analog signal
+#define DEBOUNCE_TIME 100
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -156,6 +158,8 @@ int main(void)
   HAL_DMA_Start_IT(&hdma_tim2_ch1, srcAddress, DestAddress, NS);
 
   // TODO: Write current waveform to LCD ("Sine")
+  init_LCD();
+  lcd_putstring("Sine");
   delay(3000);
 
   // TODO: Enable DMA (start transfer from LUT to CCR)
