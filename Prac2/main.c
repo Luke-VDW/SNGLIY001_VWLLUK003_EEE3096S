@@ -37,7 +37,7 @@
 #define NS 128           	// Number of samples in LUT
 #define TIM2CLK 8000000  	// STM Clock frequency
 #define F_SIGNAL 640     	// Frequency of output analog signal
-#define DEBOUNCE_TIME 100
+#define DEBOUNCE_TIME 200
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
