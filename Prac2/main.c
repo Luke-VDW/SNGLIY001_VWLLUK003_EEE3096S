@@ -21,9 +21,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <lcd_stm32f0.c>
 #include <stdio.h>
 #include "stm32f0xx.h"
-#include <lcd_stm32f0.c>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,9 +34,9 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 // TODO: Add values for below variables
-#define NS 128           // Number of samples in LUT
-#define TIM2CLK 8000000  // STM Clock frequency
-#define F_SIGNAL 640    // Frequency of output analog signal
+#define NS 128           	// Number of samples in LUT
+#define TIM2CLK 8000000  	// STM Clock frequency
+#define F_SIGNAL 640     	// Frequency of output analog signal
 #define DEBOUNCE_TIME 100
 /* USER CODE END PD */
 
@@ -94,12 +94,14 @@ uint32_t triangle_LUT[NS] = {0, 16, 32, 49, 65, 81, 97, 114,
 		325, 309, 292, 276, 260, 244, 227, 211, 195, 179,
 		162, 146, 130, 114, 97, 81, 65, 49, 32, 16, 0};
 
-// TODO: Equation to calculate TIM2_Ticks
+uint32_t currentLUT = 0;
+uint32_t last_interrupt_time = 0;
 
-uint32_t TIM2_Ticks = TIM2CLK/(F_SIGNAL*NS);; // How often to write new LUT value
+// TODO: Equation to calculate TIM2_Ticks
+uint32_t TIM2_Ticks = TIM2CLK/(F_SIGNAL*NS); // How often to write new LUT value
 uint32_t srcAddress = (uint32_t)&Sin_LUT;
 
-uint32_t DestAddress = (uint32_t) &(TIM3->CCR3); // Write LUT TO TIM3->CCR3 to modify PWM duty cycle
+uint32_t DestAddress = (uint32_t ) &(TIM3->CCR3); // Write LUT TO TIM3->CCR3 to modify PWM duty cycle
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -163,7 +165,8 @@ int main(void)
   delay(3000);
 
   // TODO: Enable DMA (start transfer from LUT to CCR)
-  __HAL_DMA_ENABLE(&hdma_tim2_ch1);
+  __HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_CC1);
+  __HAL_TIM_SET_AUTORELOAD(&htim2,TIM2_Ticks);
 
   /* USER CODE END 2 */
 
@@ -389,45 +392,47 @@ static void MX_GPIO_Init(void)
 void EXTI0_1_IRQHandler(void)
 {
 	// TODO: Debounce using HAL_GetTick()
-  uint32_t current_time = HAL_GetTick();
+
+
+	uint32_t current_time = HAL_GetTick();
 
 	if ((current_time - last_interrupt_time) > DEBOUNCE_TIME) {
 
-	  // TODO: Disable DMA transfer and abort IT, then start DMA in IT mode with new LUT and re-enable transfer
-	  // HINT: Consider using C's "switch" function to handle LUT changes
+		// TODO: Disable DMA transfer and abort IT, then start DMA in IT mode with new LUT and re-enable transfer
+		// HINT: Consider using C's "switch" function to handle LUT changes
 
-    // Disable DMA channel/stream
+		// Disable DMA stream
 
-		__HAL_DMA_DISABLE(&hdma_tim2_ch1);
 		HAL_DMA_Abort(&hdma_tim2_ch1);
-		//__HAL_TIM_DISABLE_DMA(&htim3, TIM_DMA_CC3);
+		__HAL_TIM_DISABLE_DMA(&htim2, TIM_DMA_CC1);
 
 		// Update the LUT to the new data
+
 		currentLUT=(currentLUT+1)%3;
 
-				switch (currentLUT) {
-					case 0:
-						HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)Sin_LUT, DestAddress, NS);
-						lcd_command(CLEAR);
-						lcd_putstring("Sine");
-						break;
-					case 1:
-						HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)saw_LUT, DestAddress, NS);
-						lcd_command(CLEAR);
-						lcd_putstring("Sawtooth");
-						break;
-					case 2:
-						HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)triangle_LUT, DestAddress, NS);
-						lcd_command(CLEAR);
-						lcd_putstring("Triangle");
-						break;
-				}
-    //__HAL_TIM_ENABLE_DMA(&htim3, TIM_DMA_CC3);
-		__HAL_DMA_ENABLE(&hdma_tim2_ch1);
+		switch (currentLUT) {
+			case 0:
+				HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)Sin_LUT, DestAddress, NS);
+				lcd_command(CLEAR);
+				lcd_putstring("Sine");
+				break;
+			case 1:
+				HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)saw_LUT, DestAddress, NS);
+				lcd_command(CLEAR);
+				lcd_putstring("Sawtooth");
+				break;
+			case 2:
+				HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)triangle_LUT, DestAddress, NS);
+				lcd_command(CLEAR);
+				lcd_putstring("Triangle");
+				break;
+		}
+		// Enable DMA stream
+
+		__HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_CC1);
 
 		last_interrupt_time = current_time;
 	}
-
 
 	HAL_GPIO_EXTI_IRQHandler(Button0_Pin); // Clear interrupt flags
 }
