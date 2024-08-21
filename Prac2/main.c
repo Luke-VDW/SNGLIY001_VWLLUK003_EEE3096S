@@ -399,7 +399,25 @@ void EXTI0_1_IRQHandler(void)
 		//__HAL_TIM_DISABLE_DMA(&htim3, TIM_DMA_CC3);
 
 		// Update the LUT to the new data
+		currentLUT=(currentLUT+1)%3;
 
+				switch (currentLUT) {
+					case 0:
+						HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)Sin_LUT, DestAddress, NS);
+						lcd_command(CLEAR);
+						lcd_putstring("Sine");
+						break;
+					case 1:
+						HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)saw_LUT, DestAddress, NS);
+						lcd_command(CLEAR);
+						lcd_putstring("Sawtooth");
+						break;
+					case 2:
+						HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)triangle_LUT, DestAddress, NS);
+						lcd_command(CLEAR);
+						lcd_putstring("Triangle");
+						break;
+				}
     //__HAL_TIM_ENABLE_DMA(&htim3, TIM_DMA_CC3);
 		__HAL_DMA_ENABLE(&hdma_tim2_ch1);
 
