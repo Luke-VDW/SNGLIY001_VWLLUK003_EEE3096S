@@ -36,7 +36,7 @@
 // TODO: Add values for below variables
 #define NS 128           	// Number of samples in LUT
 #define TIM2CLK 8000000  	// STM Clock frequency
-#define F_SIGNAL 640     	// Frequency of output analog signal
+#define F_SIGNAL 100     	// Frequency of output analog signal
 #define DEBOUNCE_TIME 200
 /* USER CODE END PD */
 
@@ -99,7 +99,7 @@ uint32_t last_interrupt_time = 0;
 
 // TODO: Equation to calculate TIM2_Ticks
 uint32_t TIM2_Ticks = TIM2CLK/(F_SIGNAL*NS); // How often to write new LUT value
-uint32_t srcAddress = (uint32_t)&Sin_LUT;
+uint32_t srcAddress = (uint32_t)Sin_LUT;
 
 uint32_t DestAddress = (uint32_t ) &(TIM3->CCR3); // Write LUT TO TIM3->CCR3 to modify PWM duty cycle
 /* USER CODE END PV */
