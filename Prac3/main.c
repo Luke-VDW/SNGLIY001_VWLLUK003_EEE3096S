@@ -42,6 +42,7 @@
 #define WRSR 0b00000001 // write status register
 #define READ 0b00000011
 #define WRITE 0b00000010
+#define DEBOUNCE 200    //Debounce time
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -60,6 +61,7 @@ TIM_HandleTypeDef htim16;
 
 // TODO: Define input variables
 
+uint32_t last_interrupt = 0;
 
 /* USER CODE END PV */
 
@@ -445,7 +447,24 @@ static void MX_GPIO_Init(void)
 void EXTI0_1_IRQHandler(void)
 {
 	// TODO: Add code to switch LED7 delay frequency
-	
+	uint32_t current_time = HAL_GetTick();
+
+	if ((current_time - last_interrupt)>DEBOUNCE) {
+
+		// Switch between 1 and 2 Hz flashing frequency
+
+		switch (__HAL_TIM_GET_AUTORELOAD(&htim6)){
+
+			case (500-1):
+				__HAL_TIM_SET_AUTORELOAD(&htim6, 1000-1);
+				break;
+			case (1000-1):
+				__HAL_TIM_SET_AUTORELOAD(&htim6, 500-1);
+				break;
+		}
+
+		last_interrupt = HAL_GetTick();
+	}
   
 
 	HAL_GPIO_EXTI_IRQHandler(Button0_Pin); // Clear interrupt flags
