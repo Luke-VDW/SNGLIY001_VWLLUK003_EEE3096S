@@ -148,10 +148,10 @@ int main(void)
   {
 
 	// TODO: Poll ADC
-
+  uint32_t adc_val = pollADC();
 
 	// TODO: Get CRR
-  
+  CCR = ADCtoCCR(adc_val);
 
   // Update PWM value
 	__HAL_TIM_SetCompare(&htim3, TIM_CHANNEL_3, CCR);
@@ -512,7 +512,7 @@ uint32_t pollADC(void){
 // Calculate PWM CCR value
 uint32_t ADCtoCCR(uint32_t adc_val){
   // TODO: Calculate CCR value (val) using an appropriate equation
-
+  uint32_t val = (adc_val * 48000) / 4096;
 	//return val;
 }
 
