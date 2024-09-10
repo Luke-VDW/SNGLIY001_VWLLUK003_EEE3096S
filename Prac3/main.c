@@ -64,8 +64,8 @@ TIM_HandleTypeDef htim16;
 uint32_t last_interrupt = 0;
 
 uint8_t binary_values[] = {0b10101010, 0b01010101, 0b11001100, 0b00110011, 0b11110000, 0b00001111};
-
-
+uint16_t address[] = {0x0000,0x0001,0x0002,0x0003,0x0004,0x0005};
+uint8_t count=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -143,7 +143,11 @@ int main(void)
   // TODO: Write all bytes to EEPROM using "write_to_address"
   
   
+  for(int i =0;i<6;i++){
+
+  write_to_address(address[i], binary_values[i]);
   
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -489,10 +493,12 @@ void TIM16_IRQHandler(void)
 	HAL_TIM_IRQHandler(&htim16);
 
 	// TODO: Initialise a string to output second line on LCD
-
+	uint8_t num = read_from_address(address[count%6]);
+	char lcd_line2[num];
+	count++;
 
 	// TODO: Change LED pattern; output 0x01 if the read SPI data is incorrect
-	
+
   
 
 }
