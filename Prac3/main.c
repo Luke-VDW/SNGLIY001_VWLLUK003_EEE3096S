@@ -63,6 +63,9 @@ TIM_HandleTypeDef htim16;
 
 uint32_t last_interrupt = 0;
 
+uint8_t binary_values[] = {0b10101010, 0b01010101, 0b11001100, 0b00110011, 0b11110000, 0b00001111};
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -138,6 +141,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3); // Start PWM on TIM3 Channel 3
 
   // TODO: Write all bytes to EEPROM using "write_to_address"
+  
   
   
   /* USER CODE END 2 */
