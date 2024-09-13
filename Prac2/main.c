@@ -504,7 +504,7 @@ void TIM16_IRQHandler(void)
 	}else{
 	// TODO: output 0x01 if the read SPI data is incorrect
 
-	char lcd_line2[10] = {'S','P','I',' ','E','R','R','O','R','!'};
+	char lcd_line2[16] = {'S','P','I',' ','E','R','R','O','R','!',' ',' ',' ',' ',' ',' '};
 	writeLCD(lcd_line2);
 
 	}
