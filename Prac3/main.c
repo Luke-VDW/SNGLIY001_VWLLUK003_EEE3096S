@@ -141,12 +141,12 @@ int main(void)
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3); // Start PWM on TIM3 Channel 3
 
   // TODO: Write all bytes to EEPROM using "write_to_address"
-  
-  
+
+
   for(int i =0;i<6;i++){
 
   write_to_address(address[i], binary_values[i]);
-  
+
   }
   /* USER CODE END 2 */
 
@@ -473,7 +473,7 @@ void EXTI0_1_IRQHandler(void)
 
 		last_interrupt = HAL_GetTick();
 	}
-  
+
 
 	HAL_GPIO_EXTI_IRQHandler(Button0_Pin); // Clear interrupt flags
 }
@@ -493,21 +493,36 @@ void TIM16_IRQHandler(void)
 	HAL_TIM_IRQHandler(&htim16);
 
 	// TODO: Initialise a string to output second line on LCD
-	uint8_t num = read_from_address(address[count%6]);
-	char lcd_line2[num];
+	int num = read_from_address(address[count%6]);
+
+	if(binary_values[count%6]==num){
+	char lcd_line2[10];
+	sprintf(lcd_line2,"%d",num);
+	writeLCD(lcd_line2);
+
+
+	}else{
+	// TODO: output 0x01 if the read SPI data is incorrect
+
+	char lcd_line2[16] = {'S','P','I',' ','E','R','R','O','R','!',' ',' ',' ',' ',' ',' '};
+	writeLCD(lcd_line2);
+
+	}
+
 	count++;
-
-	// TODO: Change LED pattern; output 0x01 if the read SPI data is incorrect
-
-  
 
 }
 
 // TODO: Complete the writeLCD function
 void writeLCD(char *char_in){
   delay(3000);
-	
-  
+
+  lcd_command(CLEAR);
+  lcd_command(TWOLINE_MODE);
+  lcd_putstring("EEPROM byte:");
+  lcd_command(LINE_TWO);
+  lcd_putstring(char_in);
+
 }
 
 // Get ADC value
