@@ -52,30 +52,31 @@ check_buttons:
     LDR R0, [R0, #0x10] 	   @ Load button states (IDR register)
 
     @ Check SW0: increment by 2
-    LDR R5, #SW0_MASK
-    TST R0, R5         			@ Check if SW0 is pressed
+    LDR R6, #SW0_MASK
+    TST R0, R6         			@ Check if SW0 is pressed
     BEQ skip_sw0
     MOVS R5, #2           	    @ Set increment to 2 if SW0 is pressed
+    BX LR
 skip_sw0:
 
     @ Check SW1: change delay to short delay
-    LDR R5, #SW1_MASK
-    TST R0, R5
+    LDR R6, #SW1_MASK
+    TST R0, R6
     BEQ skip_sw1
-    LDR R4, SHORT_DELAY_CNT    @ Use short delay if SW1 is pressed
+    LDR R4, #SHORT_DELAY_CNT    @ Use short delay if SW1 is pressed
 skip_sw1:
 
     @ Check SW2: set LEDs to 0xAA
-    LDR R5, #SW2_MASK
-    TST R0, R5
+    LDR R6, #SW2_MASK
+    TST R0, R6
     BEQ skip_sw2
     MOVS R2, #0xAA             @ Set LED pattern to 0xAA
     B exit_check_buttons       @ Skip remaining checks
 skip_sw2:
 
     @ Check SW3: freeze pattern
-    LDR R5, #SW3_MASK
-    TST R0, R5
+    LDR R6, #SW3_MASK
+    TST R0, R6
     BEQ exit_check_buttons
     B main_loop               @ Freeze pattern until SW3 is released
 
