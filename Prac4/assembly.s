@@ -37,62 +37,77 @@ ASM_Main:
 main_loop:
     LDR R0, GPIOA_BASE       @ Load button base address
     LDR R3, [R0, #0x10]      @ Load input from pushbuttons (IDR register)
+	BL delay_long
+	MOVS R5, #1					@ Default increment is 1
 
-    BL check_buttons          @ Check button states
-
-    STR R2, [R1, #0x14]       @ Write current LED pattern to output data register (ODR)
-
-    BL delay                  @ Call delay routine
-
-    ADD R2, R2, R5            @ Increment LED pattern by value in R5
-    B main_loop               @ Repeat the loop
-
-check_buttons:
-    MOVS R5, #1                @ Default increment is 1
-    LDR R0, [R0, #0x10] 	   @ Load button states (IDR register)
-
-    @ Check SW0: increment by 2
-    LDR R6, #SW0_MASK
-    TST R0, R6         			@ Check if SW0 is pressed
-    BEQ skip_sw0
-    MOVS R5, #2           	    @ Set increment to 2 if SW0 is pressed
-    BX LR
-skip_sw0:
-
-    @ Check SW1: change delay to short delay
-    LDR R6, #SW1_MASK
-    TST R0, R6
-    BEQ skip_sw1
-    LDR R4, #SHORT_DELAY_CNT    @ Use short delay if SW1 is pressed
-skip_sw1:
-
-    @ Check SW2: set LEDs to 0xAA
+	@ Check SW2:
     LDR R6, #SW2_MASK
-    TST R0, R6
-    BEQ skip_sw2
-    MOVS R2, #0xAA             @ Set LED pattern to 0xAA
-    B exit_check_buttons       @ Skip remaining checks
-skip_sw2:
+    TST R3, R6
+    BEQ pressed_sw2
 
-    @ Check SW3: freeze pattern
-    LDR R6, #SW3_MASK
-    TST R0, R6
-    BEQ exit_check_buttons
-    B main_loop               @ Freeze pattern until SW3 is released
+    @ Check SW0:
+    LDR R6, #SW0_MASK
+    TST R3, R6
+    BEQ pressed_sw0
 
-exit_check_buttons:
-    BX LR                      @ Return from subroutine
+    @ Check SW1:
+    LDR R6, #SW1_MASK
+    TST R3, R6
+    BEQ pressed_sw1
 
-delay:
-    MOV R0, R4                 @ Load delay count into R0
-delay_loop:
-    SUBS R0, R0, #1            @ Decrement R0
-    BNE delay_loop             @ Loop until R0 reaches 0
-    BX LR                      @ Return from delay
+main_loop2:
 
-write_leds:
+	BL pressed_sw3
+
 	STR R2, [R1, #0x14]
+	BL delay_loop				@ Call delay routine
+
+    ADD R2, R2, R5            	@ Increment LED pattern by value in R5
+
+    B main_loop               	@ Repeat the loop
+
+pressed_sw0:
+
+    MOVS R5, #2
+
+    @ Check SW1:
+    LDR R6, #SW1_MASK
+    TST R3, R6
+    BEQ pressed_sw1
+
+    B main_loop2
+
+pressed_sw1:
+
+    BL delay_short
+    B main_loop2
+
+pressed_sw2:
+	MOVS R7, #0xAA
+	STR R7, [R1, #0x14]
 	B main_loop
+
+pressed_sw3:
+	LDR R3, [R0, #0x10]
+    LDR R6, #SW3_MASK
+    TST R3, R6
+    BEQ pressed_sw3
+	BX LR
+
+delay_long:
+    LDR R4, =LONG_DELAY_CNT		@ Load delay count into R0
+    LDR R4, [R4]
+    BX LR
+
+delay_short:
+	LDR R4, =SHORT_DELAY_CNT	@ Load delay count into R0
+    LDR R4, [R4]
+    BX LR
+
+delay_loop:
+    SUBS R4, R4, #1            	@ Decrement R0
+    BNE delay_loop             	@ Loop until R0 reaches 0
+    BX LR                      	@ Return from delay
 
 @ LITERALS; DO NOT EDIT
 	.align
