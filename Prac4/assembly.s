@@ -118,8 +118,8 @@ GPIOB_BASE:  		.word 0x48000400
 MODER_OUTPUT: 		.word 0x5555
 
 @ TODO: Add your own values for these delays
-LONG_DELAY_CNT: 	.word 700000    @ Long delay for 0.7 seconds
-SHORT_DELAY_CNT: 	.word 300000    @ Short delay for 0.3 seconds
+LONG_DELAY_CNT: 	.word 2800000    @ Long delay for 0.7 seconds
+SHORT_DELAY_CNT: 	.word 1200000    @ Short delay for 0.3 seconds
 
 @ TODO: Add bit masks for buttons
 SW0_MASK:           .word 0x01     @ SW0 button mask
